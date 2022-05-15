@@ -1,0 +1,16 @@
+body{
+    background: teal;
+}
+.div-expense-form{
+    width: 300px;
+    background-color: yellowgreen;
+    color: black;
+    border: 1em solid violet;
+}
+
+.div-cat-form{
+    width: 300px;
+    background-color:chartreuse;
+    color: black;
+    border: 1em solid red;
+}

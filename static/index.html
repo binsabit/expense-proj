@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/main.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="div-expense-form">
+            <form action="http://localhost:4000/newexpense" method="POST" class="expenseForm">
+
+                <input type="text" name="expenseName" id="" placeholder="enter the name of expense" required>
+                
+                <ul class="cat-list">
+                    
+                </ul>
+                <input type="submit" value="add">
+            </form>
+        </div>
+        <div class="div-cat-form">
+            <form action="http://localhost:4000/newcategory" method="POST" class="catForm">
+                <input type="text" name="catName" placeholder="enter new category" required>
+                <input type="submit" value="add category">
+            </form>
+        </div>
+        <div class="recent-expenses">
+            <h2>recent-expenses</h2>
+            <ul class="exp-list">
+                
+            </ul>
+        </div>
+    </div>
+    <script src="./js/main.js"></script>
+</body>
+</html>
