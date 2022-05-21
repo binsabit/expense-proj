@@ -1,18 +1,12 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	models "money-tracker/model"
 	"net/http"
 	"path"
 	"text/template"
-	"time"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func (app *application) MainPage(w http.ResponseWriter, r *http.Request) {
@@ -26,127 +20,78 @@ func (app *application) MainPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := tmpl.Execute(w, ""); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
 	}
-
-	// ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	// list := client.Database("expenses-db").Collection("lists")
-
 }
 func (app *application) GetExpenses(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("get expense page")
-	collection := client.Database("expenseDB").Collection("expenses")
-	//set a context(time to finish the go routine)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	findOptions := options.Find()
-	// findOptions.SetLimit(5)
+	app.infoLog.Printf("You are on GET Expense\n")
 
-	var results []*models.Expense
-	//finding multiple elements return the a cursor
-	cur, err := collection.Find(ctx, bson.D{{}}, findOptions)
+	results, err := app.expenses.FindAllExpenses()
 	if err != nil {
-		fmt.Println("Error Finding Categories")
+		app.serverError(w, err)
 		return
 	}
 
-	//iterate thorgh the curser and add them to array.
-
-	if err = cur.All(ctx, &results); err != nil {
-		log.Print("Error GET items 2")
-		return
-	}
-	fmt.Println(results)
+	app.infoLog.Printf("%v", results)
 
 	json.NewEncoder(w).Encode(results)
 
 }
 func (app *application) PostExpense(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("post expense page")
+	app.infoLog.Printf("You are in Post Expense\n")
 	//in order to hander the post request from the form you shoulf par it first!!!
 	//Parsing
 	if err := r.ParseForm(); err != nil {
-		fmt.Println("Parsing Error Expense", err)
+		app.clientError(w, http.StatusNoContent)
 		return
 	}
 
-	//make new struct
-	newExpense := models.Expense{
-		ExpenseName: r.FormValue("expenseName"),
-		ExpenseCat:  r.FormValue("expenseCat"),
-	}
+	//expense params
+	name := r.FormValue("expenseName")
+	category := r.FormValue("expenseCat")
+	amount := r.FormValue("expenseAmount")
 
-	//select a collection
-	collection := client.Database("expenseDB").Collection("expenses")
-	//set a context(time to finish the go routine)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	//insert new expense to the database
-	res, err := collection.InsertOne(ctx, newExpense)
+	id, err := app.expenses.InsertExpense(name, category, amount)
 	if err != nil {
-		fmt.Print("Inserting Error")
+		app.serverError(w, err)
 		return
 	}
-
-	id := res.InsertedID
-
-	fmt.Println(newExpense.ExpenseName, newExpense.ExpenseCat, id)
+	app.infoLog.Printf("ID of the new Expense is %v", id)
 	http.Redirect(w, r, "/", http.StatusFound)
 
 }
 
 func (app *application) PostCategory(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("post category page")
+	app.infoLog.Println("You are in Post Category")
 	if err := r.ParseForm(); err != nil {
-		fmt.Println("Parsing Error Expense", err)
+		app.serverError(w, err)
 		return
 	}
 
-	newCategory := models.Category{
-		CatName: r.FormValue("catName"),
-	}
+	name := r.FormValue("catName")
 
-	//select a collection
-	collection := client.Database("expenseDB").Collection("expenses")
-	//set a context(time to finish the go routine)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	//insert new expense to the database
-	res, err := collection.InsertOne(ctx, newCategory)
+	id, err := app.expenses.InsertCategory(name)
 	if err != nil {
-		fmt.Print("Inserting Error")
-		return
+		app.serverError(w, err)
 	}
 
-	id := res.InsertedID
+	app.infoLog.Printf("ID of the new category is %v \n ", id)
 
-	fmt.Println(newCategory.CatName, id)
 	http.Redirect(w, r, "/", http.StatusFound)
 
 }
 
 func (app *application) GetCategories(w http.ResponseWriter, r *http.Request) {
-	collection := client.Database("expenseDB").Collection("categories")
-	//set a context(time to finish the go routine)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	findOptions := options.Find()
+	app.infoLog.Println("You are in GET Category")
 
 	var results []*models.Category
 	//finding multiple elements return the a cursor
-	cur, err := collection.Find(ctx, bson.D{{}}, findOptions)
+	results, err := app.expenses.FindAllCategories()
 	if err != nil {
-		fmt.Println("Error Finding Categories")
-		return
+		app.serverError(w, err)
 	}
-
-	//iterate thorgh the curser and add them to array.
-
-	if err = cur.All(ctx, &results); err != nil {
-		log.Print("Error GET items 2")
-		return
-	}
-	fmt.Println(results)
+	app.infoLog.Printf("%v", results)
 
 	json.NewEncoder(w).Encode(results)
 
