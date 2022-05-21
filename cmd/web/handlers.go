@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"money-tracker/model"
+	models "money-tracker/model"
 	"net/http"
 	"path"
 	"text/template"
@@ -42,7 +42,7 @@ func (app *application) GetExpenses(w http.ResponseWriter, r *http.Request) {
 	findOptions := options.Find()
 	// findOptions.SetLimit(5)
 
-	var results []*model.Expense
+	var results []*models.Expense
 	//finding multiple elements return the a cursor
 	cur, err := collection.Find(ctx, bson.D{{}}, findOptions)
 	if err != nil {
@@ -71,7 +71,7 @@ func (app *application) PostExpense(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//make new struct
-	newExpense := model.Expense{
+	newExpense := models.Expense{
 		ExpenseName: r.FormValue("expenseName"),
 		ExpenseCat:  r.FormValue("expenseCat"),
 	}
@@ -102,7 +102,7 @@ func (app *application) PostCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newCategory := model.Category{
+	newCategory := models.Category{
 		CatName: r.FormValue("catName"),
 	}
 
@@ -132,7 +132,7 @@ func (app *application) GetCategories(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 	findOptions := options.Find()
 
-	var results []*model.Category
+	var results []*models.Category
 	//finding multiple elements return the a cursor
 	cur, err := collection.Find(ctx, bson.D{{}}, findOptions)
 	if err != nil {
