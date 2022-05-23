@@ -10,6 +10,7 @@ func (app *application) routes() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/", app.MainPage).Methods("GET")
 	r.HandleFunc("/expenses", app.GetExpenses).Methods("GET")
+	r.HandleFunc("/expenses/{id}", app.DeleteExpense).Methods("DELETE")
 	r.HandleFunc("/newexpense", app.PostExpense).Methods("POST")
 	r.HandleFunc("/categories", app.GetCategories).Methods("GET")
 	r.HandleFunc("/newcategory", app.PostCategory).Methods("POST")

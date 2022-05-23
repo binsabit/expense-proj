@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"path"
 	"text/template"
+
+	"github.com/gorilla/mux"
 )
 
 func (app *application) MainPage(w http.ResponseWriter, r *http.Request) {
@@ -32,9 +34,8 @@ func (app *application) GetExpenses(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-
-	app.infoLog.Printf("%v", results)
-
+	// app.infoLog.Println("Get all Expenses:")
+	// spew.Dump(results)
 	json.NewEncoder(w).Encode(results)
 
 }
@@ -60,6 +61,20 @@ func (app *application) PostExpense(w http.ResponseWriter, r *http.Request) {
 	app.infoLog.Printf("ID of the new Expense is %v", id)
 	http.Redirect(w, r, "/", http.StatusFound)
 
+}
+
+func (app *application) DeleteExpense(w http.ResponseWriter, r *http.Request) {
+	app.infoLog.Printf("You are in Delete Expense")
+
+	params := mux.Vars(r)
+	expenseId := params["id"]
+
+	err := app.expenses.DeleteExpenseByID(expenseId)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.infoLog.Println(expenseId)
 }
 
 func (app *application) PostCategory(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +106,9 @@ func (app *application) GetCategories(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.serverError(w, err)
 	}
-	app.infoLog.Printf("%v", results)
+
+	// app.infoLog.Println("Get all Categories:")
+	// spew.Dump(results)
 
 	json.NewEncoder(w).Encode(results)
 

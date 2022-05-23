@@ -13,8 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var client *mongo.Client
-
 type application struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger

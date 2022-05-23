@@ -2,6 +2,7 @@ package mongoDB
 
 import (
 	"context"
+	"fmt"
 	models "money-tracker/model"
 	"time"
 
@@ -47,10 +48,12 @@ func (m *ModelDB) InsertExpense(name, category, amount string) (primitive.Object
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	currentTime := time.Now().Format(time.UnixDate)
 	newExpense := models.Expense{
 		ExpenseName:   name,
 		ExpenseCat:    category,
 		ExpenseAmount: amount,
+		ExpenseDate:   currentTime,
 	}
 
 	result, err := collection.InsertOne(ctx, newExpense)
@@ -63,6 +66,28 @@ func (m *ModelDB) InsertExpense(name, category, amount string) (primitive.Object
 	return id, nil
 }
 
+func (m *ModelDB) DeleteExpenseByID(id string) error {
+	collection := m.DB.Collection("expenses")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	idPrimitive, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	res, err := collection.DeleteOne(ctx, bson.M{"_id": idPrimitive})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("deleted %v documents\n", res.DeletedCount)
+	return nil
+}
+
+// func (m *ModelDB) FindExpensesByCategory(categoryName []string) {
+// 	collection := m.DB.Collection("expenses")
+// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+// 	defer cancel()
+
+// }
 func (m *ModelDB) InsertCategory(name string) (primitive.ObjectID, error) {
 	collection := m.DB.Collection("categories")
 	//set a context(time to finish the go routine)

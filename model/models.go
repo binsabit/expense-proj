@@ -13,6 +13,7 @@ type Expense struct {
 	ExpenseName   string             `json:"expenseName,omitempty" bson:"expenseName, omitempty"`
 	ExpenseAmount string             `json:"expenseAmount, omitempty" bson:"expenseAmount, omitempty"`
 	ExpenseCat    string             `json:"expenseCat,omitempty" bson:"expenseCat, omitempty"`
+	ExpenseDate   string             `json:"expenseDate, omitempty" bson:"expenseDate,omitempty"`
 }
 
 type Category struct {
