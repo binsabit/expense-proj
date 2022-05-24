@@ -8,10 +8,30 @@
     filter.addEventListener("click", getExpensesByCat)
 
     async function getExpensesByCat(){
-        const check = document.getElementsByClassName("filter-cat").checked
-        // const c = check.filter(x => {x.checked})
-
-        console.log(check)
+        const check = document.getElementsByClassName("filter-cat")
+        let checks = new Array()
+        for(let i = 0; i < check.length;i+=1){
+            if(check[i].checked == true){
+                checks.push(check[i].value) 
+            }
+        }
+        item = {
+            cats:checks,
+            dateFrom:document.querySelector("#fromDate").value,
+            dateTo:document.querySelector("#toDate").value
+        }
+        const response = await fetch("http://localhost:4000/fliter",
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(checks)
+            });
+             const content = await rawResponse.json();
+    
+        console.log(content)
     }
    
     async function showCategoriesFilter(){

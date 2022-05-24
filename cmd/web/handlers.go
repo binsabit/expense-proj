@@ -8,8 +8,15 @@ import (
 	"path"
 	"text/template"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/mux"
 )
+
+type Test struct {
+	cats     []string `json:"cats,omitempty"`
+	dateFrom string   `json:"dataForm,omitempty"`
+	dateTo   string   `json:"dataTo,omitempty"`
+}
 
 func (app *application) MainPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("main page")
@@ -77,6 +84,17 @@ func (app *application) DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	app.infoLog.Println(expenseId)
 }
 
+func (app *application) GetExpensesFiltered(w http.ResponseWriter, r *http.Request) {
+	app.infoLog.Println("You are in Get filtered category")
+	var t Test
+	err := json.NewDecoder(r.Body).Decode(&t)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	spew.Dump(t)
+
+}
 func (app *application) PostCategory(w http.ResponseWriter, r *http.Request) {
 	app.infoLog.Println("You are in Post Category")
 	if err := r.ParseForm(); err != nil {
